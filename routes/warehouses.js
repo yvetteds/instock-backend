@@ -11,17 +11,31 @@ const router = express.Router();
 /* -------------------------------------------------------------------------- */
 /*                             GET ALL WAREHOUSES                             */
 /* -------------------------------------------------------------------------- */
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
   try {
-    const warehouses = await knex("inventories");
+    const warehouses = await knex("warehouses");
 
     if (!warehouses) return [];
 
     res.json(warehouses)
   } catch (error) {
-    return res.status(500).json("We're unable to your fetch request. Please try again.")
+    return res.status(500).json(`Unable to retrieve warehouses. Please try again. ["ERROR_MESSAGE"]: ${error}`)
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/*                             DELETE A WAREHOUSE                             */
+/* -------------------------------------------------------------------------- */
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+
+  } catch (error) {
+    return res.status(500).json(`Unable to delete the selected warehouse item with #ID ${id}. Please try again. ["ERROR_MESSAGE"]: ${error}`)
   }
 })
+
 
 // GET /warehouses/:id/inventories - getting all inventory items that belog to a warehouse
 router.get("/:id/inventories", async (req, res) => {
