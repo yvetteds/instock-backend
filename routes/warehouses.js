@@ -12,9 +12,11 @@ const router = express.Router();
 // GET /warehouses/:id/inventories - getting all inventory items that belog to a warehouse
 router.get("/:id/inventories", async (req, res) => {
   try {
-    const warehouseInventory = await knex("inventories").where({
-      warehouse_id: req.params.id,
-    });
+    const warehouseInventory = await knex("inventories")
+      .where({
+        warehouse_id: req.params.id,
+      })
+      .select("id", "item_name", "category", "status", "quantity");
 
     if (!warehouseInventory.length) {
       return res.status(404).json({
