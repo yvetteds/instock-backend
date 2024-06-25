@@ -14,7 +14,6 @@ app.use(express.json());
 app.use("/warehouses", warehouses);
 app.use("/warehouses/:id", warehouses);
 app.use("/api/inventories", inventory);
-app.use("/api/inventories/:id", inventory);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
