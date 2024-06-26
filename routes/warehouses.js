@@ -58,19 +58,45 @@ router.post("/", async (req, res) => {
     });
   }
 
+  // validating phone and email
+
+  function validateEmail(email) {
+    const emailRegex =
+      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return emailRegex.test(email);
+  }
+
+  function validatePhone(phone) {
+    const phoneRegex = /^\+([0-9]{1})\s\(([0-9]{3})\)\s([0-9]{3})\-([0-9]{4})$/;
+    return phoneRegex.test(phone);
+  }
+
+  if (!validateEmail(contact_email) || !validatePhone(contact_phone)) {
+    return res.status(400).json({
+      message: "Invalid phone/email input",
+    });
+  }
+
   try {
     const result = await knex("warehouses").insert({
-      warehouse_name: warehouse_name.toUpperCase(),
+      warehouse_name:
+        warehouse_name.charAt(0).toUpperCase() + warehouse_name.slice(1),
       address,
-      city: city.toUpperCase(),
+      city: city.charAt(0).toUpperCase() + city.slice(1),
       country,
-      contact_name: contact_name.toUpperCase(),
-      contact_position: contact_position.toUpperCase(),
+      contact_name:
+        contact_name.charAt(0).toUpperCase() + contact_name.slice(1),
+      contact_position:
+        contact_position.charAt(0).toUpperCase() + contact_position.slice(1),
       contact_phone,
       contact_email,
     });
 
-    const newWarehouse = { ...result, id: uniqid() };
+    const newWarehouseId = result[0];
+
+    const newWarehouse = await knex("warehouses")
+      .where({ id: newWarehouseId })
+      .first();
 
     res.json(newWarehouse);
   } catch (error) {
