@@ -158,4 +158,28 @@ router.post("/", async (req, res) => {
   }
 });
 
+/* -------------------------------------------------------------------------- */
+/*                             EDIT A WAREHOUSE                             */
+/* -------------------------------------------------------------------------- */
+
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const warehouseData = req.body;
+  try {
+    const warehouse = await knex('warehouses').where({ id }).first();
+
+    if (!warehouse) {
+      return res.status(404).json({ message: 'Warehouse ID not found' });
+    }
+
+    await knex('warehouses').where({ id }).update(warehouseData);
+
+    const updatedWarehouse = await knex('warehouses').where({ id }).first();
+
+    res.status(200).json(updatedWarehouse);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating warehouse', error });
+  }
+});
+
 export default router;
