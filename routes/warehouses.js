@@ -27,10 +27,18 @@ router.get("/", async (_req, res) => {
 /*                             DELETE A WAREHOUSE                             */
 /* -------------------------------------------------------------------------- */
 router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    
+    const warehouse = await knex("warehouses").where({ id }).first();
+    if (!warehouse) return res.status(404).message(`The warehouse #ID: ${id}, you provided is invalid.`);
 
+    // Delete the inventory item associated to warehouse_name
+    await knex("inventories").where("warehouse_id", id).del();
+
+    // Delete the warehouse
+    await knex("warehouses").where({ id }).del();
+
+    res.status(204).send();
   } catch (error) {
     return res.status(500).json(`Unable to delete the selected warehouse item with #ID ${id}. Please try again. ["ERROR_MESSAGE"]: ${error}`)
   }
