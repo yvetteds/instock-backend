@@ -53,7 +53,7 @@ router.get("/:id/inventories", async (req, res) => {
         warehouse_id: req.params.id,
       })
       .select("id", "item_name", "category", "status", "quantity");
-
+      
     if (!warehouseInventory.length) {
       return res.status(404).json({
         message: `Warehouse with ID ${req.params.id} not found`,
