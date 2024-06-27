@@ -223,9 +223,9 @@ router.put('/:id', async (req, res) => {
     });
   }
 
+  const warehouse = await knex('warehouses').where({ id }).first();
 
   try {
-    const warehouse = await knex('warehouses').where({ id }).first();
 
     if (!warehouse) {
       return res.status(404).json({ message: 'Warehouse ID not found' });
