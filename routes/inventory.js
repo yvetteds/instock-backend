@@ -39,7 +39,23 @@ router.get("/", async (_req, res) => {
 /*                             GET SINGLE INVENTORY ITEM                      */
 /* -------------------------------------------------------------------------- */
 
-// router.get();
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const inventories = await knex("inventories").where({ id }).first();
+
+    if (!inventories)
+      res.status(404).send(`The #ID: ${id} you provided is invalid.`);
+
+    res.json(inventories);
+  } catch (error) {
+    return res
+      .status(500)
+      .json(
+        `Unable to retrieve inventories. Please try again. ["ERROR_MESSAGE"]: ${error}`
+      );
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                             DELETE INVENTORY ITEM                          */
