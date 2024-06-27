@@ -36,7 +36,13 @@ router.get("/", async (_req, res) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                             DELETE INVENTORY ITEM                            */
+/*                             GET SINGLE INVENTORY ITEM                      */
+/* -------------------------------------------------------------------------- */
+
+// router.get();
+
+/* -------------------------------------------------------------------------- */
+/*                             DELETE INVENTORY ITEM                          */
 /* -------------------------------------------------------------------------- */
 
 router.delete("/:id", async (req, res) => {
@@ -64,7 +70,7 @@ router.delete("/:id", async (req, res) => {
 /*                             EDIT INVENTORY ITEM                            */
 /* -------------------------------------------------------------------------- */
 
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const inventoryData = req.body;
 
@@ -77,44 +83,56 @@ router.put('/:id', async (req, res) => {
     inventoryData.quantity === undefined ||
     !inventoryData.status ||
     !inventoryData.warehouse_id ||
-    !inventoryData.warehouse_name) {
-    return res.status(400).json({ message: "Request contains missing properties. All inventory item properties are required." });
+    !inventoryData.warehouse_name
+  ) {
+    return res.status(400).json({
+      message:
+        "Request contains missing properties. All inventory item properties are required.",
+    });
   }
 
-  if (isNaN(Number(inventoryData.quantity))){
-    return res.status(400).json({ message: "Quantity must be a valid number." });
+  if (isNaN(Number(inventoryData.quantity))) {
+    return res
+      .status(400)
+      .json({ message: "Quantity must be a valid number." });
   }
 
   try {
-    const item = await knex('inventories').where({ id }).first();
+    const item = await knex("inventories").where({ id }).first();
     if (!item) {
       return res.status(404).json({ message: "Inventory ID not found" });
     }
 
-    const warehouse = await knex('warehouses').where({ id: inventoryData.warehouse_id }).first();
+    const warehouse = await knex("warehouses")
+      .where({ id: inventoryData.warehouse_id })
+      .first();
 
     if (warehouse) {
-      const { item_name, category, description, status, quantity, warehouse_id } = inventoryData;
-      await knex('inventories').where({ id }).update({
+      const {
         item_name,
         category,
         description,
         status,
         quantity,
-        warehouse_id
+        warehouse_id,
+      } = inventoryData;
+      await knex("inventories").where({ id }).update({
+        item_name,
+        category,
+        description,
+        status,
+        quantity,
+        warehouse_id,
       });
-
     } else {
-      return res.status(404).json({ message: 'Warehouse ID not found' });
+      return res.status(404).json({ message: "Warehouse ID not found" });
     }
 
-    const updatedItem = await knex('inventories').where({ id }).first();
+    const updatedItem = await knex("inventories").where({ id }).first();
     res.status(200).json(updatedItem);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating warehouse', error });
+    res.status(500).json({ message: "Error updating warehouse", error });
   }
-
 });
-
 
 export default router;
