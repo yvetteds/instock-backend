@@ -185,12 +185,64 @@ router.post("/", async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const warehouseData = req.body;
+
+  // Validation steps
+  if (
+    !warehouseData.id ||
+    !warehouseData.warehouse_name ||
+    !warehouseData.address ||
+    !warehouseData.city ||
+    !warehouseData.country ||
+    !warehouseData.contact_name ||
+    !warehouseData.contact_position ||
+    !warehouseData.contact_phone ||
+    !warehouseData.contact_email) {
+    return res.status(400).json({ message: "Request contains missing properties. All warehouse details are required." });
+  }
+
+  // validating phone and email
+
+  function validateEmail(email) {
+    const emailRegex =
+      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return emailRegex.test(warehouseData.contact_email);
+  }
+
+  function validatePhone(phone) {
+    const phoneRegex = /^\+([0-9]{1})\s\(([0-9]{3})\)\s([0-9]{3})\-([0-9]{4})$/;
+    return phoneRegex.test(warehouseData.contact_phone);
+  }
+
+  if (!validateEmail(warehouseData.contact_email)) {
+    return res.status(400).json({
+      message: "Invalid email input",
+    });
+  } else if (!validatePhone(warehouseData.contact_phone)) {
+    return res.status(400).json({
+      message: "Invalid phone number input",
+    });
+  }
+
+  const warehouse = await knex('warehouses').where({ id }).first();
+
   try {
-    const warehouse = await knex('warehouses').where({ id }).first();
+
     if (!warehouse) {
       return res.status(404).json({ message: 'Warehouse ID not found' });
     } else {
-      await knex('warehouses').where({ id }).update(warehouseData);
+      const { id, warehouse_name, address, city, country, contact_name, contact_position, contact_phone, contact_email } = warehouseData;
+      await knex('warehouses').where({ id }).update({
+        id,
+        warehouse_name,
+        address,
+        city,
+        country,
+        contact_name,
+        contact_position,
+        contact_phone,
+        contact_email,
+      });
+
       const updatedWarehouse = await knex('warehouses').where({ id }).first();
       res.status(200).json(updatedWarehouse);
     }
