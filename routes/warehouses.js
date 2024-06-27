@@ -28,6 +28,26 @@ router.get("/", async (_req, res) => {
 });
 
 /* -------------------------------------------------------------------------- */
+/*                           GET SINGLE WAREHOUSE                             */
+/* -------------------------------------------------------------------------- */
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const warehouses = await knex("warehouses").where({id}).first();
+
+    if (!warehouses) res.status(404).send(`The #ID: ${id} you provided is invalid.`);
+
+    res.json(warehouses);
+  } catch (error) {
+    return res
+      .status(500)
+      .json(
+        `Unable to retrieve warehouses. Please try again. ["ERROR_MESSAGE"]: ${error}`
+      );
+  }
+});
+
+/* -------------------------------------------------------------------------- */
 /*                             DELETE A WAREHOUSE                             */
 /* -------------------------------------------------------------------------- */
 router.delete("/:id", async (req, res) => {
