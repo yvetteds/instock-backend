@@ -12,7 +12,7 @@ const router = express.Router(); // routing
 // Note: The warehouse name for each inventory item must also be included in the response.
 
 /* -------------------------------------------------------------------------- */
-/*                             GET INVENTORY ITEM                            */
+/*                             GET INVENTORY ITEMS                            */
 /* -------------------------------------------------------------------------- */
 
 router.get("/", async (_req, res) => {
