@@ -197,7 +197,7 @@ router.put('/:id', async (req, res) => {
     !warehouseData.contact_position ||
     !warehouseData.contact_phone ||
     !warehouseData.contact_email) {
-    return res.status(400).json({ message: "Request contains missing properties. All inventory item properties are required." });
+    return res.status(400).json({ message: "Request contains missing properties. All warehouse details are required." });
   }
 
   // validating phone and email
@@ -230,7 +230,19 @@ router.put('/:id', async (req, res) => {
     if (!warehouse) {
       return res.status(404).json({ message: 'Warehouse ID not found' });
     } else {
-      await knex('warehouses').where({ id }).update(warehouseData);
+      const { id, warehouse_name, address, city, country, contact_name, contact_position, contact_phone, contact_email } = warehouseData;
+      await knex('warehouses').where({ id }).update({
+        id,
+        warehouse_name,
+        address,
+        city,
+        country,
+        contact_name,
+        contact_position,
+        contact_phone,
+        contact_email,
+      });
+
       const updatedWarehouse = await knex('warehouses').where({ id }).first();
       res.status(200).json(updatedWarehouse);
     }
