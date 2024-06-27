@@ -10,7 +10,7 @@
     "migrate:down": "knex migrate:down",
     "migrate:rollback": "knex migrate:rollback",
     "seed": "knex seed:run",
-    "start": "nodemon server.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
