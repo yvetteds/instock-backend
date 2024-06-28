@@ -11,11 +11,27 @@ const router = express.Router();
 /* -------------------------------------------------------------------------- */
 /*                             GET ALL WAREHOUSES                             */
 /* -------------------------------------------------------------------------- */
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const warehouses = await knex("warehouses");
+    const { sort_by = "warehouse_name", order_by = "asc" } = req.query;
 
-    if (!warehouses) return [];
+    const orders = ['asc', 'desc'];
+
+    if (!sort_by) {
+      return res.status(400).send(`Invalid sort_by column: ${sort_by}`);
+    }
+
+    const order = orders.includes(order_by.toLowerCase()) ? order_by : 'asc';
+
+    let query = knex("warehouses");
+
+    if (sort_by) {
+      query = query.orderBy(sort_by, order);
+    }
+
+    const warehouses = await query;
+
+    if (!warehouses) return res.status(404).json({ message: "No warehouses found" });
 
     res.json(warehouses);
   } catch (error) {
@@ -33,7 +49,7 @@ router.get("/", async (_req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const warehouses = await knex("warehouses").where({id}).first();
+    const warehouses = await knex("warehouses").where({ id }).first();
 
     if (!warehouses) res.status(404).send(`The #ID: ${id} you provided is invalid.`);
 

@@ -12,7 +12,7 @@ app.use(express.json());
 // app.use(express.static("public")); // use if needed for static assets in public folder, don't think will be needed but here just in case
 
 app.use("/api/warehouses", warehouses);
-app.use("/api/warehouses/:id", warehouses);
+// app.use("/api/warehouses/:id", warehouses);
 app.use("/api/inventories", inventory);
 
 app.listen(PORT, () => {
