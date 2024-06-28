@@ -15,9 +15,19 @@ const router = express.Router(); // routing
 /*                             GET INVENTORY ITEMS                            */
 /* -------------------------------------------------------------------------- */
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const data = await knex("inventories")
+    const { sort_by = "warehouse_name", order_by = "asc" } = req.query;
+
+    const orders = ['asc', 'desc'];
+
+    if (!sort_by) {
+      return res.status(400).send(`Invalid sort_by column: ${sort_by}`);
+    }
+
+    const order = orders.includes(order_by.toLowerCase()) ? order_by : 'asc';
+
+    let data = await knex("inventories")
       .join("warehouses", "inventories.warehouse_id", "warehouses.id")
       .select(
         "inventories.id",
@@ -28,8 +38,9 @@ router.get("/", async (_req, res) => {
         "status",
         "quantity",
         "warehouse_id"
-      );
-    res.status(200).json(data);
+      ).orderBy(sort_by, order);
+
+      res.status(200).json(data);
   } catch (err) {
     res.status(500).send(`Error retrieving inventories: ${err}`);
   }
