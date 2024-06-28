@@ -162,4 +162,73 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+/* -------------------------------------------------------------------------- */
+/*                             ADD INVENTORY ITEM                            */
+/* -------------------------------------------------------------------------- */
+
+router.post("/", async (req, res) => {
+  const inventoryData = req.body;
+
+  // Validation steps
+  if (
+    !inventoryData.category ||
+    !inventoryData.description ||
+    !inventoryData.id ||
+    !inventoryData.item_name ||
+    inventoryData.quantity === undefined ||
+    !inventoryData.status ||
+    !inventoryData.warehouse_id ||
+    !inventoryData.warehouse_name
+  ) {
+    return res
+      .status(400)
+      .json({
+        message:
+          "Request contains missing properties. All inventory item properties are required.",
+      });
+  }
+
+  if (isNaN(Number(inventoryData.quantity))) {
+    return res
+      .status(400)
+      .json({ message: "Quantity must be a valid number." });
+  }
+
+  try {
+    const warehouse = await knex("warehouses")
+      .where({ id: inventoryData.warehouse_id })
+      .first();
+
+    if (warehouse) {
+      const {
+        id,
+        item_name,
+        category,
+        description,
+        status,
+        quantity,
+        warehouse_id,
+      } = inventoryData;
+
+      await knex("inventories").insert({
+        item_name,
+        category,
+        description,
+        status,
+        quantity,
+        warehouse_id,
+      });
+
+      const newItem = await knex("inventories").where({ id }).first();
+      res.status(201).json(newItem);
+    } else {
+      return res.status(404).json({ message: "Warehouse ID not found" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error creating new inventory item", error });
+  }
+});
+
 export default router;
