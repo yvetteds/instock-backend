@@ -53,7 +53,8 @@ router.get("/:id", async (req, res) => {
         "status",
         "quantity"
       )
-      .where("inventories.id", id);
+      .where("inventories.id", id)
+      .first();
 
     if (!inventories)
       res.status(404).send(`The #ID: ${id} you provided is invalid.`);
