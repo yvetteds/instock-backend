@@ -42,7 +42,18 @@ router.get("/", async (_req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const inventories = await knex("inventories").where({ id }).first();
+    const inventories = await knex("inventories")
+      .join("warehouses", "inventories.warehouse_id", "warehouses.id")
+      .select(
+        "inventories.id",
+        "warehouse_name",
+        "item_name",
+        "description",
+        "category",
+        "status",
+        "quantity"
+      )
+      .where("inventories.id", id);
 
     if (!inventories)
       res.status(404).send(`The #ID: ${id} you provided is invalid.`);
