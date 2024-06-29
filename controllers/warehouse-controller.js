@@ -31,6 +31,8 @@ const singleWarehouse = async (req, res) => {
 
     if (!warehouses)
       res.status(404).send(`The #ID: ${id} you provided is invalid.`);
+    if (!warehouses)
+      res.status(404).send(`The #ID: ${id} you provided is invalid.`);
 
     res.json(warehouses);
   } catch (error) {
@@ -140,9 +142,9 @@ const addWarhouse = async (req, res) => {
     return res.status(400).json({
       message: "Invalid email input",
     });
-  } else if (!validatePhone(contact_phone)) {
+  } else if (contact_phone.length < 11) {
     return res.status(400).json({
-      message: "Invalid phone number input",
+      message: "Invalid phone input",
     });
   }
 
@@ -161,7 +163,9 @@ const addWarhouse = async (req, res) => {
         .split(" ")
         .map((word) => word[0].toUpperCase() + word.slice(1))
         .join(" "),
-      contact_phone,
+      contact_phone: contact_phone
+        .replace(/\D/g, "")
+        .replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, "+$1 ($2) $3-$4"),
       contact_email,
     });
 
@@ -219,9 +223,9 @@ const editWarehouse = async (req, res) => {
     return res.status(400).json({
       message: "Invalid email input",
     });
-  } else if (!validatePhone(warehouseData.contact_phone)) {
+  } else if (contact_phone.length < 11) {
     return res.status(400).json({
-      message: "Invalid phone number input",
+      message: "Invalid phone input",
     });
   }
 
@@ -242,17 +246,21 @@ const editWarehouse = async (req, res) => {
         contact_phone,
         contact_email,
       } = warehouseData;
-      await knex("warehouses").where({ id }).update({
-        id,
-        warehouse_name,
-        address,
-        city,
-        country,
-        contact_name,
-        contact_position,
-        contact_phone,
-        contact_email,
-      });
+      await knex("warehouses")
+        .where({ id })
+        .update({
+          id,
+          warehouse_name,
+          address,
+          city,
+          country,
+          contact_name,
+          contact_position,
+          contact_phone: contact_phone
+            .replace(/\D/g, "")
+            .replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, "+$1 ($2) $3-$4"),
+          contact_email,
+        });
 
       const updatedWarehouse = await knex("warehouses").where({ id }).first();
       res.status(200).json(updatedWarehouse);
