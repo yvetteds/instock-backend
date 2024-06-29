@@ -1,17 +1,11 @@
-import express from "express";
 import initKnex from "knex";
 import configuration from "../knexfile.js";
-import fs from "fs";
-import uniqid from "uniqid";
-
 const knex = initKnex(configuration);
-const router = express.Router();
 
-// this is where the API endpoints will be built for the warehouses
 /* -------------------------------------------------------------------------- */
 /*                             GET ALL WAREHOUSES                             */
 /* -------------------------------------------------------------------------- */
-router.get("/", async (_req, res) => {
+const warehouses = async (_req, res) => {
   try {
     const warehouses = await knex("warehouses");
 
@@ -25,16 +19,18 @@ router.get("/", async (_req, res) => {
         `Unable to retrieve warehouses. Please try again. ["ERROR_MESSAGE"]: ${error}`
       );
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                           GET SINGLE WAREHOUSE                             */
 /* -------------------------------------------------------------------------- */
-router.get("/:id", async (req, res) => {
+const singleWarehouse = async (req, res) => {
   try {
     const { id } = req.params;
     const warehouses = await knex("warehouses").where({ id }).first();
 
+    if (!warehouses)
+      res.status(404).send(`The #ID: ${id} you provided is invalid.`);
     if (!warehouses)
       res.status(404).send(`The #ID: ${id} you provided is invalid.`);
 
@@ -46,12 +42,12 @@ router.get("/:id", async (req, res) => {
         `Unable to retrieve warehouses. Please try again. ["ERROR_MESSAGE"]: ${error}`
       );
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                             DELETE A WAREHOUSE                             */
 /* -------------------------------------------------------------------------- */
-router.delete("/:id", async (req, res) => {
+const deleteWarehouse = async (req, res) => {
   const { id } = req.params;
   try {
     const warehouse = await knex("warehouses").where({ id }).first();
@@ -74,10 +70,12 @@ router.delete("/:id", async (req, res) => {
         `Unable to delete the selected warehouse item with #ID ${id}. Please try again. ["ERROR_MESSAGE"]: ${error}`
       );
   }
-});
+};
 
-// GET /api/warehouses/:id/inventories - getting all inventory items that belog to a warehouse
-router.get("/:id/inventories", async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                     GET ALL INVENTORY FOR A SINGLE WAREHOUSE               */
+/* -------------------------------------------------------------------------- */
+const singleWarehouseDetails = async (req, res) => {
   try {
     const warehouseInventory = await knex("inventories")
       .where({
@@ -95,10 +93,12 @@ router.get("/:id/inventories", async (req, res) => {
   } catch (error) {
     res.status(500).send(`Error retrieving warehouse inventory ${error}`);
   }
-});
+};
 
-// POST /api/warehouses - post a new warehouse
-router.post("/", async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                             ADD A WAREHOUSE                                */
+/* -------------------------------------------------------------------------- */
+const addWarhouse = async (req, res) => {
   const {
     warehouse_name,
     address,
@@ -179,13 +179,12 @@ router.post("/", async (req, res) => {
   } catch (error) {
     res.status(500).send(`Error posting warehouse ${error}`);
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                             EDIT A WAREHOUSE                             */
 /* -------------------------------------------------------------------------- */
-
-router.put("/:id", async (req, res) => {
+const editWarehouse = async (req, res) => {
   const { id } = req.params;
   const warehouseData = req.body;
 
@@ -269,6 +268,13 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error updating warehouse", error });
   }
-});
+};
 
-export default router;
+export {
+  warehouses,
+  singleWarehouse,
+  singleWarehouseDetails,
+  deleteWarehouse,
+  editWarehouse,
+  addWarhouse,
+};

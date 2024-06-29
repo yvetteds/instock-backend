@@ -1,21 +1,12 @@
-import express from "express";
-import fs from "fs";
-import uniqid from "uniqid";
 import initKnex from "knex";
 import configuration from "../knexfile.js";
 const knex = initKnex(configuration);
-
-const router = express.Router(); // routing
-
-// this is where the API endpoints will be built for the inventory
-
-// Note: The warehouse name for each inventory item must also be included in the response.
 
 /* -------------------------------------------------------------------------- */
 /*                             GET INVENTORY ITEMS                            */
 /* -------------------------------------------------------------------------- */
 
-router.get("/", async (_req, res) => {
+const inventoryItems = async (_req, res) => {
   try {
     const data = await knex("inventories")
       .join("warehouses", "inventories.warehouse_id", "warehouses.id")
@@ -33,13 +24,13 @@ router.get("/", async (_req, res) => {
   } catch (err) {
     res.status(500).send(`Error retrieving inventories: ${err}`);
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                             GET SINGLE INVENTORY ITEM                      */
 /* -------------------------------------------------------------------------- */
 
-router.get("/:id", async (req, res) => {
+const singleInventoryItem = async (req, res) => {
   try {
     const { id } = req.params;
     const inventories = await knex("inventories")
@@ -67,13 +58,13 @@ router.get("/:id", async (req, res) => {
         `Unable to retrieve inventories. Please try again. ["ERROR_MESSAGE"]: ${error}`
       );
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                             DELETE INVENTORY ITEM                          */
 /* -------------------------------------------------------------------------- */
 
-router.delete("/:id", async (req, res) => {
+const deleteInventoryItem = async (req, res) => {
   try {
     const rowsDeleted = await knex("inventories")
       .where({ id: req.params.id })
@@ -92,13 +83,13 @@ router.delete("/:id", async (req, res) => {
       message: `Unable to delete inventory item ${req.params.id}: ${error}`,
     });
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                             EDIT INVENTORY ITEM                            */
 /* -------------------------------------------------------------------------- */
 
-router.put("/:id", async (req, res) => {
+const editInventoryItem = async (req, res) => {
   const { id } = req.params;
   const inventoryData = req.body;
 
@@ -161,13 +152,13 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error updating warehouse", error });
   }
-});
+};
 
 /* -------------------------------------------------------------------------- */
 /*                             ADD INVENTORY ITEM                            */
 /* -------------------------------------------------------------------------- */
 
-router.post("/", async (req, res) => {
+const addInventoryItem = async (req, res) => {
   const inventoryData = req.body;
 
   // Validation steps
@@ -181,12 +172,10 @@ router.post("/", async (req, res) => {
     !inventoryData.warehouse_id ||
     !inventoryData.warehouse_name
   ) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "Request contains missing properties. All inventory item properties are required.",
-      });
+    return res.status(400).json({
+      message:
+        "Request contains missing properties. All inventory item properties are required.",
+    });
   }
 
   if (isNaN(Number(inventoryData.quantity))) {
@@ -230,6 +219,12 @@ router.post("/", async (req, res) => {
       .status(500)
       .json({ message: "Error creating new inventory item", error });
   }
-});
+};
 
-export default router;
+export {
+  inventoryItems,
+  singleInventoryItem,
+  deleteInventoryItem,
+  editInventoryItem,
+  addInventoryItem,
+};
