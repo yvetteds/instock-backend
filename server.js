@@ -5,15 +5,17 @@ import warehouses from "./routes/warehouses-route.js";
 import inventory from "./routes/inventory-route.js";
 
 const app = express();
-const PORT = process.env.PORT ?? 8080;
+const { PORT, CORS_ORIGIN } = process.env;
 
-app.use(cors());
+PORT = process.env.PORT ?? 8080;
+
+app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json());
-// app.use(express.static("public")); // use if needed for static assets in public folder, don't think will be needed but here just in case
 
 app.use("/api/warehouses", warehouses);
 app.use("/api/warehouses/:id", warehouses);
 app.use("/api/inventories", inventory);
+app.use("/api/inventories/:id", inventory);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
