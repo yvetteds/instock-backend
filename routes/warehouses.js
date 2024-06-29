@@ -142,16 +142,11 @@ router.post("/", async (req, res) => {
     return res.status(400).json({
       message: "Invalid email input",
     });
-  } else if (contact_phone.length < 11) {
+  } else if (contact_phone.length < 12) {
     return res.status(400).json({
       message: "Invalid phone input",
     });
   }
-  // else if (!validatePhone(contact_phone)) {
-  //   return res.status(400).json({
-  //     message: "Invalid phone number input",
-  //   });
-  // }
 
   try {
     const result = await knex("warehouses").insert({
@@ -170,7 +165,7 @@ router.post("/", async (req, res) => {
         .join(" "),
       contact_phone: contact_phone
         .replace(/\D/g, "")
-        .replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, "+$1 ($2) $3-$4"),
+        .replace(/(\d{1,2})(\d{3})(\d{3})(\d{4})/, "+$1 ($2) $3-$4"),
       contact_email,
     });
 
@@ -229,9 +224,9 @@ router.put("/:id", async (req, res) => {
     return res.status(400).json({
       message: "Invalid email input",
     });
-  } else if (!validatePhone(warehouseData.contact_phone)) {
+  } else if (contact_phone.length < 12) {
     return res.status(400).json({
-      message: "Invalid phone number input",
+      message: "Invalid phone input",
     });
   }
 
@@ -252,17 +247,21 @@ router.put("/:id", async (req, res) => {
         contact_phone,
         contact_email,
       } = warehouseData;
-      await knex("warehouses").where({ id }).update({
-        id,
-        warehouse_name,
-        address,
-        city,
-        country,
-        contact_name,
-        contact_position,
-        contact_phone,
-        contact_email,
-      });
+      await knex("warehouses")
+        .where({ id })
+        .update({
+          id,
+          warehouse_name,
+          address,
+          city,
+          country,
+          contact_name,
+          contact_position,
+          contact_phone: contact_phone
+            .replace(/\D/g, "")
+            .replace(/(\d{1,2})(\d{3})(\d{3})(\d{4})/, "+$1 ($2) $3-$4"),
+          contact_email,
+        });
 
       const updatedWarehouse = await knex("warehouses").where({ id }).first();
       res.status(200).json(updatedWarehouse);
