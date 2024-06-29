@@ -1,8 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import warehouses from "./routes/warehouses.js";
-import inventory from "./routes/inventory.js";
+import warehouses from "./routes/warehouses-route.js";
+import inventory from "./routes/inventory-route.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 8080;
