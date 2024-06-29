@@ -14,4 +14,8 @@ router
   .delete(warehouseControllers.deleteWarehouse)
   .put(warehouseControllers.editWarehouse);
 
+router
+  .route("/:id/inventories")
+  .get(warehouseControllers.singleWarehouseDetails);
+
 export default router;
