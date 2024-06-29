@@ -13,9 +13,7 @@ app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json());
 
 app.use("/api/warehouses", warehouses);
-app.use("/api/warehouses/:id", warehouses);
 app.use("/api/inventories", inventory);
-app.use("/api/inventories/:id", inventory);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
