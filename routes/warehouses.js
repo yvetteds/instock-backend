@@ -142,7 +142,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({
       message: "Invalid email input",
     });
-  } else if (contact_phone.length < 12) {
+  } else if (contact_phone.length < 11) {
     return res.status(400).json({
       message: "Invalid phone input",
     });
