@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch server.js",
-    "db:migrate": "knex migrate:latest",
-    "db:seed": "knex seed:run"
+    "migrate": "knex migrate:latest",
+    "migrate:down": "knex migrate:down",
+    "migrate:rollback": "knex migrate:rollback",
+    "seed": "knex seed:run",
+    "start": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +22,8 @@
     "knex": "^3.1.0",
     "mysql2": "^3.10.1",
     "uniqid": "^5.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
